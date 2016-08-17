@@ -1,0 +1,6 @@
+{
+    "extends": "revolt",
+    "rules": {
+        "no-console": 0
+    }
+}
