@@ -1,26 +1,37 @@
+import _     from 'lodash';
 import chalk from 'chalk';
-import execa from 'execa';
 
 import config from '../config';
+import spawn  from '../spawn';
 
 function build() {
-    process.stdout.write(`building docker image`);
+    console.log(chalk.dim('building docker image'));
 
-    let progressInterval = setInterval(() => {
-        process.stdout.write('.');
-    }, 5000);
-
-    return execa('docker', ['build', `-t ${config.get('name')}:latest`])
+    return spawn('docker', ['build', '-t', `${config.get('name')}:latest`, '.'])
     .then(() => {
-        clearInterval(progressInterval);
-        process.stdout.write(chalk.bold.green('\u2713'));
+        console.log(`${chalk.bold.green('\u2713')} docker image built`);
     });
 }
 
-function tag() {
-    console.log(`\n${chalk.bold('tagging Docker image')}\n`);
+function tag(commander) {
+    let tags = commander.tag;
+    if (tags.length === 0) {
+        tags = [config.get('version')];
+    }
 
-    return Promise.resolve();
+    console.log();
+    console.log(chalk.dim(`tagging Docker image with ${tags.join(', ')}`));
+
+    let promises = _.map(tags, (tag) => ['tag', `${config.get('name')}:latest`, `${config.get('name')}:${tag}`]);
+
+    return _.reduce(promises, (p, args) => {
+        return p.then(() => {
+            return spawn('docker', args)
+            .then(() => {
+                console.log(`${chalk.bold.green('\u2713')} tagged ${_.last(args)}`);
+            });
+        });
+    }, Promise.resolve());
 }
 
 export default {

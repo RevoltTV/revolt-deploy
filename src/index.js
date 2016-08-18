@@ -1,23 +1,20 @@
-//import commander from 'commander';
+import commander from 'commander';
 
 import commands from './commands';
-
-commands.deploy();
-
-/*import commands from './commands';
 import pkg      from '../package.json';
+
+function collect(value, array) {
+    array.push(value);
+    return array;
+}
 
 commander.version(pkg.version);
 
 commander
-    .command('deploy [directory]')
-    .description('deploy the project specified in [directory]')
-    .action(commands.deploy);
+    .option('-t, --tag <tag>', 'the tag to apply to the Docker image. defaults to package.json version', collect, [])
+    .option('--name <name>', 'the name of the docker image to deploy')
+    .option('--ecr-region <region>', 'the region that the elastic container repository is in');
 
-commander
-    .command('docker:build')
-    .description('build a docker image')
-    .option('-t, --tag <tag>', 'tag the docker image with the provided string')
-    .action(commands.docker.build);
+commander.parse(process.argv);
 
-commander.parse(process.argv);*/
+commands.deploy(commander);
