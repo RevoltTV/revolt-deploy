@@ -1,10 +1,18 @@
 import _     from 'lodash';
 import chalk from 'chalk';
-import execa from 'execa';
 
 import config   from '../config';
 import * as ecr from './ecr';
 import spawn    from '../spawn';
+
+function getTags({ tag }) {
+    let tags = tag;
+    if (tags.length === 0) {
+        tags = [config.get('version')];
+    }
+
+    return tags;
+}
 
 export function build() {
     console.log(chalk.dim('building docker image'));
@@ -24,16 +32,13 @@ export function login() {
     });
 }
 
-export function tag(commander) {
-    let tags = commander.tag;
-    if (tags.length === 0) {
-        tags = [config.get('version')];
-    }
+export function tag(commander, repository) {
+    let tags = getTags(commander);
 
     console.log();
     console.log(chalk.dim(`tagging Docker image with ${tags.join(', ')}`));
 
-    let promises = _.map(tags, (tag) => ['tag', `${config.get('name')}:latest`, `${config.get('name')}:${tag}`]);
+    let promises = _.map(tags, (tag) => ['tag', `${config.get('name')}:latest`, `${repository || config.get('name')}:${tag}`]);
 
     return _.reduce(promises, (p, args) => {
         return p.then(() => {
@@ -46,5 +51,24 @@ export function tag(commander) {
 }
 
 export function push(commander) {
-    return login();
+    return login()
+    .then(ecr.ensureRepositoryExists)
+    .then((repositoryUri) => {
+        let tags = getTags(commander);
+
+        return tag({
+            tag: tags
+        }, repositoryUri)
+        .then(() => {
+            return _.reduce(tags, (p, tag) => {
+                return p.then(() => {
+                    console.log(`pushing image to ${repositoryUri}:${tag}`);
+                    return spawn('docker', ['push', `${repositoryUri}:${tag}`])
+                    .then(() => {
+                        console.log(`${chalk.green.bold('\u2713')} image pushed`);
+                    });
+                });
+            }, Promise.resolve());
+        });
+    });
 }

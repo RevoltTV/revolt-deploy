@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import config      from '../config';
 import * as docker from './docker';
 
-export function deploy(commander) {
+export default function deploy(commander) {
     console.log(`\n${chalk.bold(`deploying ${config.get('name')}@${config.get('version')}`)}\n`);
 
     return docker.build(commander)

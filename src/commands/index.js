@@ -1,4 +1,4 @@
-import * as deploy from './deploy';
+import deploy from './deploy';
 import * as docker from './docker';
 import * as ecr    from './ecr';
 
