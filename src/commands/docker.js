@@ -2,8 +2,9 @@ import _     from 'lodash';
 import chalk from 'chalk';
 import execa from 'execa';
 
-import config from '../config';
-import spawn  from '../spawn';
+import config   from '../config';
+import * as ecr from './ecr';
+import spawn    from '../spawn';
 
 export function build() {
     console.log(chalk.dim('building docker image'));
@@ -11,6 +12,15 @@ export function build() {
     return spawn('docker', ['build', '-t', `${config.get('name')}:latest`, '.'])
     .then(() => {
         console.log(`${chalk.bold.green('\u2713')} docker image built`);
+    });
+}
+
+export function login() {
+    return ecr.getLoginToken()
+    .then(({ user, password, endpoint }) => {
+        console.log(chalk.dim('logging into docker...'));
+
+        return spawn('docker', ['login', '-u', user, '-p', password, endpoint]);
     });
 }
 
@@ -36,18 +46,5 @@ export function tag(commander) {
 }
 
 export function push(commander) {
-    let repoConfig = config.get('repository');
-    if (!repoConfig.accountId || !repoConfig.name || !repoConfig.region) {
-        return Promise.reject(new Error('elastic container repository is not configured'));
-    }
-
-    let loginArgs = ['ecr', 'get-login'];
-    if (_.isObject(repoConfig) && repoConfig.region) {
-        loginArgs.push(`--region=${repoConfig.region}`);
-    }
-
-    return execa('aws', loginArgs)
-    .then((result) => {
-        console.log(result.stdout);
-    });
+    return login();
 }

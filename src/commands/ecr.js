@@ -3,6 +3,19 @@ import chalk from 'chalk';
 
 import config from '../config';
 
+let ECR;
+
+function getECR() {
+    if (!ECR) {
+        let cfg = getRepositoryConfig();
+        ECR = new AWS.ECR({
+            region: cfg.region
+        });
+    }
+
+    return ECR;
+}
+
 function getRepositoryConfig() {
     let cfg = config.get('repository');
 
@@ -22,11 +35,9 @@ export function getRepositoryUrl() {
 export function ensureRepositoryExists() {
     let cfg = getRepositoryConfig();
 
-    process.stdout.write(chalk.dim(`\nensuring repository ${cfg.name} exists for ${cfg.accountId} in ${cfg.region}...`));
+    let ecr = getECR();
 
-    const ecr = new AWS.ECR({
-        region: cfg.region
-    });
+    process.stdout.write(chalk.dim(`\nensuring repository ${cfg.name} exists for ${cfg.accountId} in ${cfg.region}...`));
 
     return ecr.describeRepositories({
         registryId: cfg.accountId,
@@ -53,5 +64,26 @@ export function ensureRepositoryExists() {
 
             return result.repository.repositoryUri;
         });
+    });
+}
+
+export function getLoginToken() {
+    let cfg = getRepositoryConfig();
+    let ecr = getECR();
+
+    return ecr.getAuthorizationToken({
+        registryIds: [cfg.accountId]
+    }).promise()
+    .then((result) => {
+        let token = result.authorizationData[0].authorizationToken;
+        let endpoint = result.authorizationData[0].proxyEndpoint;
+
+        let parts = Buffer.from(token, 'base64').toString().split(':');
+
+        return {
+            user: parts[0],
+            password: parts[1],
+            endpoint
+        };
     });
 }
