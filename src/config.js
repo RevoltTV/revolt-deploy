@@ -19,7 +19,7 @@ const config = convict({
         doc: 'environment configuration to use for this deployment',
         format: String,
         default: 'production',
-        env: 'NODE_ENV',
+        env: 'DEPLOY_ENV',
         arg: 'env'
     },
     name: {
@@ -35,8 +35,35 @@ const config = convict({
         default: pkg.version,
         env: 'DEPLOYMENT_VERSION',
         arg: 'version'
+    },
+    repository: {
+        accountId: {
+            doc: 'ID of the AWS account that owns the container repository',
+            format: String,
+            default: '',
+            env: 'ECR_ACCOUNT_ID',
+            arg: 'ecr-account-id'
+        },
+        region: {
+            doc: 'The region the container repository is in',
+            format: String,
+            default: '',
+            env: 'ECR_REGION',
+            arg: 'ecr-region'
+        },
+        name: {
+            doc: 'The name of the container repository',
+            format: String,
+            default: '',
+            env: 'ECR_NAME',
+            arg: 'ecr-name'
+        }
     }
 });
+
+if (_.get(pkg, `diddy.common`)) {
+    config.load(pkg.diddy.common);
+}
 
 if (_.get(pkg, `diddy.${config.get('env')}`)) {
     config.load(pkg.diddy[config.get('env')]);
@@ -44,7 +71,8 @@ if (_.get(pkg, `diddy.${config.get('env')}`)) {
 
 if (fs.existsSync(path.join(process.cwd(), 'diddy.yml'))) {
     let yaml = jsYaml.safeLoad(fs.readFileSync(path.join(process.cwd(), 'diddy.yml')));
-    config.load(yaml[config.get('env')]);
+    config.load(yaml.common || {});
+    config.load(yaml[config.get('env')] || {});
 }
 
 export default config;
