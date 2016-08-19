@@ -1,25 +1,15 @@
-import _     from 'lodash';
 import chalk from 'chalk';
 
 import config   from '../config';
 import * as ecr from './ecr';
 import spawn    from '../spawn';
 
-function getTags({ tag }) {
-    let tags = tag;
-    if (tags.length === 0) {
-        tags = [config.get('version')];
-    }
-
-    return tags;
-}
-
 export function build() {
-    console.log(chalk.dim('building docker image'));
+    console.log(chalk.dim('building docker image\n'));
 
     return spawn('docker', ['build', '-t', `${config.get('name')}:latest`, '.'])
     .then(() => {
-        console.log(`${chalk.bold.green('\u2713')} docker image built`);
+        console.log(`\n${chalk.bold.green('\u2713')} docker image built\n`);
     });
 }
 
@@ -32,43 +22,30 @@ export function login() {
     });
 }
 
-export function tag(commander, repository) {
-    let tags = getTags(commander);
-
-    console.log();
-    console.log(chalk.dim(`tagging Docker image with ${tags.join(', ')}`));
-
-    let promises = _.map(tags, (tag) => ['tag', `${config.get('name')}:latest`, `${repository || config.get('name')}:${tag}`]);
-
-    return _.reduce(promises, (p, args) => {
-        return p.then(() => {
-            return spawn('docker', args)
-            .then(() => {
-                console.log(`${chalk.bold.green('\u2713')} tagged ${_.last(args)}`);
-            });
-        });
-    }, Promise.resolve());
+export function tag(tag, repository) {
+    console.log(chalk.dim(`tagging Docker image with ${repository ? repository + ':' : ''}${tag}`));
+    return spawn('docker', ['tag', `${config.get('name')}:latest`, `${repository || config.get('name')}:${tag}`])
+    .then(() => {
+        console.log(`${chalk.bold.green('\u2713')} tagged ${repository ? repository + ':' : ''}${tag}\n`);
+    });
 }
 
 export function push(commander) {
     return login()
     .then(ecr.ensureRepositoryExists)
     .then((repositoryUri) => {
-        let tags = getTags(commander);
-
-        return tag({
-            tag: tags
-        }, repositoryUri)
+        return tag(commander.tag, repositoryUri)
         .then(() => {
-            return _.reduce(tags, (p, tag) => {
-                return p.then(() => {
-                    console.log(`pushing image to ${repositoryUri}:${tag}`);
-                    return spawn('docker', ['push', `${repositoryUri}:${tag}`])
-                    .then(() => {
-                        console.log(`${chalk.green.bold('\u2713')} image pushed`);
-                    });
-                });
-            }, Promise.resolve());
+            return spawn('docker', ['push', `${repositoryUri}:${commander.tag}`])
+            .then(() => {
+                console.log(`${chalk.green.bold('\u2713')} image pushed\n`);
+            });
+        })
+        .then(() => {
+            return ecr.cleanUntaggedImages();
+        })
+        .then(() => {
+            return repositoryUri;
         });
     });
 }

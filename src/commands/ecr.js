@@ -26,10 +26,39 @@ function getRepositoryConfig() {
     return cfg;
 }
 
-export function getRepositoryUrl() {
+export function cleanUntaggedImages() {
     let cfg = getRepositoryConfig();
+    let ecr = getECR();
 
-    return `${cfg.accountId}.dkr.ecr.${cfg.region}.amazonaws.com/${cfg.name}`;
+    console.log('cleaning up any untagged repository images...');
+
+    return ecr.listImages({
+        filter: {
+            tagStatus: 'UNTAGGED'
+        },
+        maxResults: 100,
+        registryId: cfg.accountId,
+        repositoryName: cfg.name
+    }).promise()
+    .then((results) => {
+        if (results.imageIds.length === 0) {
+            console.log(chalk.dim('no images to delete\n'));
+            return;
+        }
+
+        process.stdout.write(chalk.dim(`deleting ${results.imageIds.length} image${results.imageIds.length === 1 ? '' : 's'}...`));
+        return ecr.batchDeleteImage({
+            imageIds: results.imageIds,
+            registryId: cfg.accountId,
+            repositoryName: cfg.name
+        }).promise()
+        .then(() => {
+            process.stdout.write(chalk.green.bold(' \u2713 DONE\n\n'));
+            if (results.imageIds.length === 100) {
+                return cleanUntaggedImages();
+            }
+        });
+    });
 }
 
 export function ensureRepositoryExists() {
@@ -44,7 +73,7 @@ export function ensureRepositoryExists() {
         repositoryNames: [cfg.name]
     }).promise()
     .then((result) => {
-        process.stdout.write(chalk.green.bold('FOUND\n'));
+        process.stdout.write(chalk.green.bold(' \u2713 FOUND\n\n'));
 
         return result.repositories[0].repositoryUri;
     })
@@ -53,6 +82,7 @@ export function ensureRepositoryExists() {
             throw err;
         }
 
+        process.stdout.write(chalk.red.bold(' X'));
         process.stdout.write(chalk.yellow.bold(' NOT FOUND\n'));
         process.stdout.write(chalk.dim(`creating repository...`));
 
@@ -60,11 +90,17 @@ export function ensureRepositoryExists() {
             repositoryName: cfg.name
         }).promise()
         .then((result) => {
-            process.stdout.write(chalk.green.bold(' \u2713 DONE\n'));
+            process.stdout.write(chalk.green.bold(' \u2713 DONE\n\n'));
 
             return result.repository.repositoryUri;
         });
     });
+}
+
+export function getRepositoryUrl() {
+    let cfg = getRepositoryConfig();
+
+    return `${cfg.accountId}.dkr.ecr.${cfg.region}.amazonaws.com/${cfg.name}`;
 }
 
 export function getLoginToken() {
