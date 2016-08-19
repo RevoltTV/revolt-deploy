@@ -48,9 +48,15 @@ common:
         region: 'aws-region-1'
 
 production:
+    cluster: 'name-of-cluster'
     regions:
         - 'aws-region-1'
         - 'aws-region-2'
+    service:
+        name: 'name-of-service'
+        count: 2
+        minimumPercent: 50
+        maximumPercent: 200
     task:
         name: 'the-task-name'
         networkMode: 'bridge|host|none'

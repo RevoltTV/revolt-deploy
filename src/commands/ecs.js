@@ -4,6 +4,29 @@ import chalk from 'chalk';
 
 import config from '../config';
 
+function createService(taskDefinition, region) {
+    let ecs = getECS(region);
+    let cluster = config.get('cluster');
+    let service = config.get('service');
+
+    console.log(chalk.dim(`service ${service.name} was not found in ${region}, creating...`));
+
+    return ecs.createService({
+        desiredCount: service.count,
+        serviceName: service.name,
+        taskDefinition,
+        cluster,
+        deploymentConfiguration: {
+            maximumPercent: service.maximumPercent,
+            minimumHealthyPercent: service.minimumPercent
+        }
+    }).promise()
+    .then((result) => {
+        console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.name} created in ${region}`);
+        return result;
+    });
+}
+
 function getECS(region) {
     return new AWS.ECS({
         region
@@ -17,6 +40,24 @@ function getRegions() {
     }
 
     return regions;
+}
+
+function updateService(taskDefinition, region) {
+    let ecs = getECS(region);
+    let cluster = config.get('cluster');
+    let service = config.get('service');
+
+    console.log(chalk.dim(`service ${service.name} found in ${region}, updating...`));
+
+    return ecs.updateService({
+        serviceName: service.name,
+        cluster,
+        taskDefinition
+    }).promise()
+    .then((result) => {
+        console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.name} updated in ${region}`);
+        return result;
+    });
 }
 
 export function createTaskDefinition(imageUri) {
@@ -117,6 +158,35 @@ export function ensureClusterExists() {
     .then(() => { console.log(); });
 }
 
+export function runService(taskDefinition, region) {
+    let cluster = config.get('cluster');
+    let service = config.get('service');
+
+    console.log(chalk.dim(`starting service ${service.name} for cluster ${cluster} in ${region}`));
+
+    let ecs = getECS(region);
+
+    console.log(chalk.dim(`ensuring service exists in ${region}`));
+    return ecs.describeServices({
+        services: [service.name],
+        cluster
+    }).promise()
+    .then((result) => {
+        if (result.services.length > 0 && result.services[0].status === 'ACTIVE') {
+            // Service was found, we can update it
+            return updateService(taskDefinition, region);
+        }
+
+        return createService(taskDefinition, region);
+    })
+    .then(({service}) => {
+        return {
+            service,
+            region
+        };
+    });
+}
+
 export function registerTask(task) {
     let regions = getRegions();
 
@@ -142,4 +212,17 @@ export function registerTask(task) {
             return tasks;
         });
     }));
+}
+
+export function waitForStable(service, region) {
+    let ecs = getECS(region);
+
+    return ecs.waitFor('servicesStable', {
+        services: [service.serviceName],
+        cluster: config.get('cluster')
+    }).promise()
+    .then((result) => {
+        console.log(`    ${chalk.bold.green('\u2713')} service ${service.serviceName} ${chalk.bold.green('STABLE')} in ${region}`);
+        return result;
+    });
 }

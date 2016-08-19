@@ -9,7 +9,7 @@ export function build() {
 
     return spawn('docker', ['build', '-t', `${config.get('name')}:latest`, '.'])
     .then(() => {
-        console.log(`\n${chalk.bold.green('\u2713')} docker image built\n`);
+        console.log(`    ${chalk.bold.green('\u2713')} docker image built\n`);
     });
 }
 
@@ -26,7 +26,7 @@ export function tag(tag, repository) {
     console.log(chalk.dim(`tagging Docker image with ${repository ? repository + ':' : ''}${tag}`));
     return spawn('docker', ['tag', `${config.get('name')}:latest`, `${repository || config.get('name')}:${tag}`])
     .then(() => {
-        console.log(`${chalk.bold.green('\u2713')} tagged ${repository ? repository + ':' : ''}${tag}\n`);
+        console.log(`    ${chalk.bold.green('\u2713')} tagged ${repository ? repository + ':' : ''}${tag}\n`);
     });
 }
 
@@ -36,16 +36,17 @@ export function push() {
     .then((repositoryUri) => {
         return tag(config.get('tag'), repositoryUri)
         .then(() => {
+            console.log(chalk.dim(`pushing Docker image to ${repositoryUri}`));
             return spawn('docker', ['push', `${repositoryUri}:${config.get('tag')}`])
             .then(() => {
-                console.log(`${chalk.green.bold('\u2713')} image pushed\n`);
+                console.log(`    ${chalk.green.bold('\u2713')} image pushed\n`);
             });
         })
         .then(() => {
             return ecr.cleanUntaggedImages();
         })
         .then(() => {
-            return repositoryUri;
+            return `${repositoryUri}:${config.get('tag')}`;
         });
     });
 }
