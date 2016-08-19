@@ -68,9 +68,7 @@ const config = convict({
     version: {
         doc: 'version of the package to be deployed',
         format: String,
-        default: pkg.version,
-        env: 'DEPLOYMENT_VERSION',
-        arg: 'version'
+        default: pkg.version
     },
     repository: {
         accountId: {
