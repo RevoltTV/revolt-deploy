@@ -30,13 +30,13 @@ export function tag(tag, repository) {
     });
 }
 
-export function push(commander) {
+export function push() {
     return login()
     .then(ecr.ensureRepositoryExists)
     .then((repositoryUri) => {
-        return tag(commander.tag, repositoryUri)
+        return tag(config.get('tag'), repositoryUri)
         .then(() => {
-            return spawn('docker', ['push', `${repositoryUri}:${commander.tag}`])
+            return spawn('docker', ['push', `${repositoryUri}:${config.get('tag')}`])
             .then(() => {
                 console.log(`${chalk.green.bold('\u2713')} image pushed\n`);
             });

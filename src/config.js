@@ -50,6 +50,13 @@ const config = convict({
         env: 'DEPLOYMENT_NAME',
         arg: 'name'
     },
+    tag: {
+        doc: 'tag to apply to docker image',
+        format: String,
+        default: pkg.version,
+        env: 'DEPLOYMENT_TAG',
+        arg: 'tag'
+    },
     version: {
         doc: 'version of the package to be deployed',
         format: String,

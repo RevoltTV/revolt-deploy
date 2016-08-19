@@ -9,7 +9,7 @@ export default function deploy(commander) {
 
     return docker.build()
     .then(() => {
-        return docker.tag(commander.tag);
+        return docker.tag(config.get('tag'));
     })
     .then(() => {
         return docker.push(commander);
