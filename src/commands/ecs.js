@@ -1,15 +1,13 @@
-import _   from 'lodash';
-import AWS from 'aws-sdk';
+import _     from 'lodash';
+import AWS   from 'aws-sdk';
+import chalk from 'chalk';
 
 import config from '../config';
 
-let ECS;
-function getECS() {
-    if (!ECS) {
-        ECS = new AWS.ECS();
-    }
-
-    return ECS;
+function getECS(region) {
+    return new AWS.ECS({
+        region
+    });
 }
 
 export function createTaskDefinition(imageUri) {
@@ -77,4 +75,27 @@ export function createTaskDefinition(imageUri) {
     task.containerDefinitions = [container];
 
     return Promise.resolve(task);
+}
+
+export function registerTask(task) {
+    let regions = config.get('regions');
+    if (_.isString(regions)) {
+        regions = [regions];
+    }
+
+    console.log(chalk.dim(`registering task definition in ${regions.join(', ')}`));
+
+    return Promise.all(_.map(regions, (region) => {
+        let ecs = getECS(region);
+
+        return ecs.registerTaskDefinition(task).promise()
+        .then((result) => {
+            console.log(`    ${chalk.bold.green('\u2713')} task created in ${region}`);
+
+            return {
+                region,
+                task: result.taskDefinition.taskDefinitionArn
+            };
+        });
+    }));
 }

@@ -48,6 +48,9 @@ common:
         region: 'aws-region-1'
 
 production:
+    regions:
+        - 'aws-region-1'
+        - 'aws-region-2'
     task:
         name: 'the-task-name'
         networkMode: 'bridge|host|none'

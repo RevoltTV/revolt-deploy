@@ -18,7 +18,7 @@ convict.addFormat({
     name: 'aws-name',
     validate: function (value) {
         if (!/^[a-zA-Z0-9\-_]{1,255}$/.test(value)) {
-            throw new TypeError('task.name :: Up to 255 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed');
+            throw new TypeError('value format is up to 255 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed');
         }
     }
 });
@@ -31,6 +31,14 @@ convict.addFormat({
 
         if (isNaN(value) || parseInt(Number(value)) !== value || isNaN(parseInt(value, 10))) {
             throw new TypeError('value must be either null or an integer');
+        }
+    }
+});
+convict.addFormat({
+    name: 'string-or-array',
+    validate: function (value) {
+        if (!_.isString(value) && !_.isArray(value)) {
+            throw new TypeError('value must be either a string or an array');
         }
     }
 });
@@ -86,6 +94,13 @@ const config = convict({
             env: 'ECR_NAME',
             arg: 'ecr-name'
         }
+    },
+    regions: {
+        doc: 'The regions to deploy to',
+        format: 'string-or-array',
+        default: null,
+        env: 'DEPLOYMENT_REGIONS',
+        arg: 'regions'
     },
     task: {
         name: {
