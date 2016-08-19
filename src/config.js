@@ -95,12 +95,49 @@ const config = convict({
             arg: 'ecr-name'
         }
     },
+    cluster: {
+        doc: 'The name of the cluster to run the service in',
+        format: 'aws-name',
+        default: '',
+        env: 'CLUSTER',
+        arg: 'cluster'
+    },
     regions: {
         doc: 'The regions to deploy to',
         format: 'string-or-array',
         default: null,
         env: 'DEPLOYMENT_REGIONS',
         arg: 'regions'
+    },
+    service: {
+        name: {
+            doc: 'The name of the service',
+            format: 'aws-name',
+            default: '',
+            env: 'SERVICE_NAME',
+            arg: 'service-name'
+        },
+        count: {
+            doc: 'The number of tasks to run in the service',
+            format: 'nat',
+            default: 2,
+            env: 'SERVICE_COUNT',
+            arg: 'service-count'
+        },
+        minimumPercent: {
+            doc: 'The minimum healthy percent to initialize the service with',
+            format: 'nat',
+            default: 50,
+            env: 'SERVICE_MINIMUM_PERCENT',
+            arg: 'service-minimum-percent'
+        },
+        maximumPercent: {
+            doc: 'The maximum healthy percent the service can use',
+            format: 'nat',
+            default: 200,
+            env: 'SERVICE_MAXIMUM_PERCENT',
+            arg: 'service-maximum-percent'
+        }
     },
     task: {
         name: {
