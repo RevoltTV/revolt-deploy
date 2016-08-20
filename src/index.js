@@ -31,7 +31,6 @@ commander
     .option('--ecs-container-ports <ports>', 'ports to publish for the container');
 
 commander.parse(process.argv);
-commander.tag = commander.tag || config.get('version');
 
 commands.deploy(commander)
 .catch((err) => {
