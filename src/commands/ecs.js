@@ -22,7 +22,7 @@ function createService(taskDefinition, region) {
         }
     }).promise()
     .then((result) => {
-        console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.name} created in ${region}`);
+        console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.serviceName} created in ${region}`);
         return result;
     });
 }
@@ -55,7 +55,7 @@ function updateService(taskDefinition, region) {
         taskDefinition
     }).promise()
     .then((result) => {
-        console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.name} updated in ${region}`);
+        console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.serviceName} updated in ${region}`);
         return result;
     });
 }
