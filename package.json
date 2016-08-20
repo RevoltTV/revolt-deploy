@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "I don’t say it in a cocky way, but I take pride in being one of the best at doing what I do.",
   "bin": {
-    "diddy-deploy-dat": "bin/diddy-deploy-dat.js"
+    "diddy-deploy-dat": "bin/diddy-deploy-dat"
   },
   "main": "lib/index.js",
   "files": [
