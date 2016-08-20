@@ -206,12 +206,12 @@ export function registerTask(task) {
                 region,
                 task: result.taskDefinition.taskDefinitionArn
             };
-        })
-        .then((tasks) => {
-            console.log();
-            return tasks;
         });
-    }));
+    }))
+    .then((tasks) => {
+        console.log();
+        return tasks;
+    });
 }
 
 export function waitForStable(service, region) {
