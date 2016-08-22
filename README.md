@@ -76,6 +76,13 @@ production:
                 LOG_LEVEL: 'info'
 ```
 
+### AWS Configuration
+
+`diddy-deploy-dat` does not make any assumptions about how AWS is configured in the system. As such, any method listed
+in http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html should be sufficient.
+
+It's recommended to use the Environmental Variable configuration method.
+
 ## Deploying
 
 Each deployment will create a Docker image and tag it with information from the
@@ -89,3 +96,12 @@ and `DEPLOYMENT_TAG` or command line arguments `--name` and `--tag`.
 $: cd /your/project
 $: DEPLOYMENT_ENV=production diddy-deploy-dat --tag $CI_BUILD_NUMBER
 ```
+
+## Limitations
+
+As of right now, `diddy-deploy-dat` does not do the following:
+
+* Add EC2 instances to a new cluster
+* Attach an Elastic Load Balancer to a new service
+
+These tasks will need to be completed manually at the moment, though this may change sometime in the future.
