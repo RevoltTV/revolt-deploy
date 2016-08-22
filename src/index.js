@@ -1,7 +1,6 @@
 import commander from 'commander';
 
 import commands from './commands';
-import config   from './config';
 import pkg      from '../package.json';
 
 commander
