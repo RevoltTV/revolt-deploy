@@ -13,6 +13,7 @@ commander
     .option('--tag <tag>', 'tag to apply to the Docker image. defaults to package.json version')
     .option('--cluster <name>', 'name of the cluster')
     .option('--regions <region>', 'regions to deploy to')
+    .option('--docker-build-arg <arg>', 'docker build argument')
     .option('--service-name <name>', 'name of the service')
     .option('--service-count <count>', 'number of tasks to run for the service')
     .option('--service-minimum-percent <percent>', 'minimum healthy percentage for the service')
