@@ -7,7 +7,16 @@ import spawn    from '../spawn';
 export function build() {
     console.log(chalk.dim('building docker image\n'));
 
-    return spawn('docker', ['build', '-t', `${config.get('name')}:latest`, '.'])
+    let args = ['build', '-t', `${config.get('name')}:latest`];
+
+    if (config.get('docker.buildArg')) {
+        args.push('--build-arg');
+        args.push(config.get('docker.buildArg'));
+    }
+
+    args.push('.');
+
+    return spawn('docker', args)
     .then(() => {
         console.log(`    ${chalk.bold.green('\u2713')} docker image built\n`);
     });

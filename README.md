@@ -42,6 +42,8 @@ the `DEPLOYMENT_ENV` environment variable, or the `--env` command line argument
 
 ```
 common:
+    docker:
+        buildArg: 'NPM_TOKEN=your-npm-token'
     repository:
         accountId: 'AWS_ACCOUNT_NUMBER'
         name: 'repository-name'

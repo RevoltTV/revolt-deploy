@@ -70,6 +70,15 @@ const config = convict({
         format: String,
         default: pkg.version
     },
+    docker: {
+        buildArg: {
+            doc: 'Argument to pass into the Docker build',
+            format: String,
+            default: '',
+            env: 'DOCKER_BUILD_ARG',
+            arg: 'docker-build-arg'
+        }
+    },
     repository: {
         accountId: {
             doc: 'ID of the AWS account that owns the container repository',
