@@ -217,12 +217,18 @@ export function registerTask(task) {
 export function waitForStable(service, region) {
     let ecs = getECS(region);
 
-    return ecs.waitFor('servicesStable', {
+    let request = ecs.waitFor('servicesStable', {
         services: [service.serviceName],
         cluster: config.get('cluster')
-    }).promise()
+    });
+
+    request.on('extractData', () => {
+        process.stdout.write('.');
+    });
+
+    return request.promise()
     .then((result) => {
-        console.log(`    ${chalk.bold.green('\u2713')} service ${service.serviceName} ${chalk.bold.green('STABLE')} in ${region}`);
+        console.log(`\n    ${chalk.bold.green('\u2713')} service ${service.serviceName} ${chalk.bold.green('STABLE')} in ${region}`);
         return result;
     });
 }
