@@ -50,7 +50,7 @@ function updateService(taskDefinition, region) {
     console.log(chalk.dim(`service ${service.name} found in ${region}, updating...`));
 
     return ecs.updateService({
-        serviceName: service.name,
+        service: service.name,
         cluster,
         taskDefinition
     }).promise()
