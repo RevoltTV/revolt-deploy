@@ -1,4 +1,4 @@
-# Diddy Deploy Dat
+# revolt-deploy
 
 A deployment tool geared primarily for @RevoltTV's deployment process, but may
 be beneficial/extensible to other deployment patterns.
@@ -14,22 +14,22 @@ This tool performs the following primary tasks:
 ## Installation
 
 ```
-npm install -g diddy-deploy-dat
+npm install -g revolt-deploy
 ```
 
 ## Configuring
 
-`diddy-deploy-dat` can be configured in a few different ways:
+`revolt-deploy` can be configured in a few different ways:
 
 * environment variables
 * command line arguments
-* a `diddy.yml` file
+* a `revolt.yml` file
 
-It's recommended to use a `diddy.yml` file for most of the configuration, but
+It's recommended to use a `revolt.yml` file for most of the configuration, but
 anything that can be considered sensitive can be passed in via the command line
 or an environment variable
 
-### `diddy.yml` structure
+### `revolt.yml` structure
 
 The key `common` in the YAML file is used for shared configuration details that
 can be used for any deployment environment. It is recommended to use this for
@@ -78,7 +78,7 @@ production:
 
 ### AWS Configuration
 
-`diddy-deploy-dat` does not make any assumptions about how AWS is configured in the system. As such, any method listed
+`revolt-deploy` does not make any assumptions about how AWS is configured in the system. As such, any method listed
 in http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html should be sufficient.
 
 It's recommended to use the Environmental Variable configuration method.
@@ -94,12 +94,12 @@ and `DEPLOYMENT_TAG` or command line arguments `--name` and `--tag`.
 
 ```
 $: cd /your/project
-$: DEPLOYMENT_ENV=production diddy-deploy-dat --tag $CI_BUILD_NUMBER
+$: DEPLOYMENT_ENV=production revolt-deploy --tag $CI_BUILD_NUMBER
 ```
 
 ## Limitations
 
-As of right now, `diddy-deploy-dat` does not do the following:
+As of right now, `revolt-deploy` does not do the following:
 
 * Add EC2 instances to a new cluster
 * Attach an Elastic Load Balancer to a new service

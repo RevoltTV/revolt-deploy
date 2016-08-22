@@ -199,16 +199,16 @@ const config = convict({
     }
 });
 
-if (_.get(pkg, `diddy.common`)) {
-    config.load(pkg.diddy.common);
+if (_.get(pkg, `revolt.common`)) {
+    config.load(pkg.revolt.common);
 }
 
-if (_.get(pkg, `diddy.${config.get('env')}`)) {
-    config.load(pkg.diddy[config.get('env')]);
+if (_.get(pkg, `revolt.${config.get('env')}`)) {
+    config.load(pkg.revolt[config.get('env')]);
 }
 
-if (fs.existsSync(path.join(process.cwd(), 'diddy.yml'))) {
-    let yaml = jsYaml.safeLoad(fs.readFileSync(path.join(process.cwd(), 'diddy.yml')));
+if (fs.existsSync(path.join(process.cwd(), 'revolt.yml'))) {
+    let yaml = jsYaml.safeLoad(fs.readFileSync(path.join(process.cwd(), 'revolt.yml')));
     config.load(yaml.common || {});
     config.load(yaml[config.get('env')] || {});
 }

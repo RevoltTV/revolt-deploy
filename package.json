@@ -1,9 +1,9 @@
 {
-  "name": "diddy-deploy-dat",
+  "name": "@revolttv/revolt-deploy",
   "version": "0.1.0",
-  "description": "I don’t say it in a cocky way, but I take pride in being one of the best at doing what I do.",
+  "description": "Tool for deploying to Amazon Elastic Container Service.",
   "bin": {
-    "diddy-deploy-dat": "bin/diddy-deploy-dat"
+    "revolt-deploy": "bin/revolt-deploy"
   },
   "main": "lib/index.js",
   "files": [
@@ -21,14 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RevoltTV/diddy-deploy-dat.git"
+    "url": "git+https://github.com/RevoltTV/revolt-deploy.git"
   },
   "author": "REVOLT TV <digital.engineering@revolt.tv>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/RevoltTV/diddy-deploy-dat/issues"
+    "url": "https://github.com/RevoltTV/revolt-deploy/issues"
   },
-  "homepage": "https://github.com/RevoltTV/diddy-deploy-dat#readme",
+  "homepage": "https://github.com/RevoltTV/revolt-deploy#readme",
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-cli": "^6.11.4",

@@ -6,7 +6,7 @@ import pkg      from '../package.json';
 
 commander
     .version(pkg.version)
-    .description(`Magical deployment tool. Configure it with either a diddy.yml file, or in a \`diddy\` section of your package.json, or via the command line`);
+    .description(`Magical deployment tool. Configure it with either a revolt.yml file, or in a \`revolt\` section of your package.json, or via the command line`);
 
 commander
     .option('--env <env>', 'environment configuration to use for deployment')
