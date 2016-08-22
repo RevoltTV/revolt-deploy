@@ -114,7 +114,12 @@ export function getLoginToken() {
         let token = result.authorizationData[0].authorizationToken;
         let endpoint = result.authorizationData[0].proxyEndpoint;
 
-        let parts = Buffer.from(token, 'base64').toString().split(':');
+        let parts;
+        if (Buffer.from) {
+            parts = Buffer.from(token, 'base64').toString().split(':');
+        } else {
+            parts = new Buffer(token, 'base64').toString().split(':');
+        }
 
         return {
             user: parts[0],
