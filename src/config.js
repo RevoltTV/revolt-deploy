@@ -2,8 +2,9 @@ import _       from 'lodash';
 import chalk   from 'chalk';
 import convict from 'convict';
 import fs      from 'fs';
-import path    from 'path';
 import jsYaml  from 'js-yaml';
+import path    from 'path';
+import semver  from 'semver';
 
 let pkg;
 try {
@@ -221,6 +222,27 @@ if (fs.existsSync(path.join(process.cwd(), 'revolt.yml'))) {
     config.load(yaml.common || {});
     config.load(yaml[config.get('env')] || {});
 }
+
+// Perform token replacement on any config values
+let props = config.getProperties();
+function replaceTokens(obj, parents) {
+    _.each(obj, (value, key) => {
+        if (_.isObject(value)) {
+            return replaceTokens(value, parents + key + '.');
+        }
+
+        if (!_.isString(value)) {
+            return;
+        }
+
+        value = value.replace(/\$\{VERSION_MAJOR\}/g, semver.major(config.get('version')))
+                     .replace(/\$\{VERSION_MINOR\}/g, semver.minor(config.get('version')))
+                     .replace(/\$\{VERSION\}/g, config.get('version'));
+
+        config.set(parents + key, value);
+    });
+}
+replaceTokens(props, '');
 
 config.validate();
 

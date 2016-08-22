@@ -78,6 +78,17 @@ production:
                 LOG_LEVEL: 'info'
 ```
 
+### Token Replacement
+
+The tool allows for a few token replacements which can be useful for dynamic naming. Tokens can be specified in the
+configuration value like so: `name: service-version-${VERSION_MAJOR}`, which will replace with `name: service-version-1`.
+
+Tokens:
+
+* `VERSION_MAJOR` - major version from package.json version number
+* `VERSION_MINOR` - minor version from package.json version number
+* `VERSION`       - full version number from package.json
+
 ### AWS Configuration
 
 `revolt-deploy` does not make any assumptions about how AWS is configured in the system. As such, any method listed
