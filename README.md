@@ -14,7 +14,7 @@ This tool performs the following primary tasks:
 ## Installation
 
 ```
-npm install -g revolt-deploy
+npm install -g @revolttv/revolt-deploy
 ```
 
 ## Configuring
