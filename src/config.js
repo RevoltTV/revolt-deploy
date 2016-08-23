@@ -140,6 +140,11 @@ const config = convict({
                 env: 'ELB_TARGET_GROUP_NAME',
                 arg: 'elb-target-group-name'
             },
+            deregistrationDelay: {
+                doc: 'Time to wait before removing target from group',
+                format: 'nat',
+                default: 60
+            },
             healthCheck: {
                 interval: {
                     doc: 'Interval to check for healthy target',

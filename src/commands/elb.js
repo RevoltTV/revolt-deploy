@@ -119,8 +119,20 @@ function createTargetGroup(region, loadBalancer) {
         UnhealthyThresholdCount: healthCheck.unhealthyCount
     }).promise()
     .then((result) => {
-        console.log(`    ${chalk.bold.green('\u2713')} target group created in ${region}`);
         return result.TargetGroups[0];
+    })
+    .then((targetGroup) => {
+        return elb.modifyTargetGroupAttributes({
+            TargetGroupArn: targetGroup.TargetGroupArn,
+            Attributes: [{
+                Key: 'deregistration_delay.timeout_seconds',
+                Value: config.get('loadBalancer.targetGroup.deregistrationDelay').toString()
+            }]
+        }).promise()
+        .then(() => {
+            console.log(`    ${chalk.bold.green('\u2713')} target group created in ${region}`);
+            return targetGroup;
+        });
     });
 }
 
