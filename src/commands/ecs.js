@@ -2,28 +2,53 @@ import _     from 'lodash';
 import AWS   from 'aws-sdk';
 import chalk from 'chalk';
 
-import config from '../config';
+import config   from '../config';
+import * as elb from './elb';
 
 function createService(taskDefinition, region) {
     let ecs = getECS(region);
     let cluster = config.get('cluster');
     let service = config.get('service');
+    let promise = Promise.resolve();
 
     console.log(chalk.dim(`service ${service.name} was not found in ${region}, creating...`));
 
-    return ecs.createService({
-        desiredCount: service.count,
-        serviceName: service.name,
-        taskDefinition,
-        cluster,
-        deploymentConfiguration: {
-            maximumPercent: service.maximumPercent,
-            minimumHealthyPercent: service.minimumPercent
+    if (config.get('loadBalancer.name')) {
+        // A load balancer was configured, we need to ensure that it exists
+        // and the target groups exist and all that
+        promise = promise.then(() => {
+            return elb.getServiceLoadBalancer(region);
+        });
+    }
+
+    return promise.then((elb) => {
+        let params = {
+            desiredCount: service.count,
+            serviceName: service.name,
+            taskDefinition,
+            cluster,
+            deploymentConfiguration: {
+                maximumPercent: service.maximumPercent,
+                minimumHealthyPercent: service.minimumPercent
+            }
+        };
+
+        if (elb) {
+            let task = createTaskDefinition('image');
+            params.loadBalancers = [];
+            params.loadBalancers.push({
+                containerName: task.containerDefinitions[0].name,
+                containerPort: task.containerDefinitions[0].portMappings[0].containerPort,
+                targetGroupArn: elb.targetGroup.TargetGroupArn
+            });
+            params.role = config.get('service.role');
         }
-    }).promise()
-    .then((result) => {
-        console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.serviceName} created in ${region}`);
-        return result;
+
+        return ecs.createService(params).promise()
+        .then((result) => {
+            console.log(`    ${chalk.bold.green('\u2713')} service ${result.service.serviceName} created in ${region}`);
+            return result;
+        });
     });
 }
 
@@ -124,7 +149,7 @@ export function createTaskDefinition(imageUri) {
 
     task.containerDefinitions = [container];
 
-    return Promise.resolve(task);
+    return task;
 }
 
 export function ensureClusterExists() {

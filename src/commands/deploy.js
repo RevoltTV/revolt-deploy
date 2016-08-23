@@ -16,9 +16,7 @@ export default function deploy() {
         return docker.push();
     })
     .then((repositoryUri) => {
-        return ecs.createTaskDefinition(repositoryUri);
-    })
-    .then((taskDefinition) => {
+        let taskDefinition = ecs.createTaskDefinition(repositoryUri);
         return ecs.registerTask(taskDefinition);
     })
     .then((tasks) => {

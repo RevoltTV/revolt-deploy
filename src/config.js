@@ -117,6 +117,63 @@ const config = convict({
         env: 'DEPLOYMENT_REGIONS',
         arg: 'regions'
     },
+    loadBalancer: {
+        name: {
+            doc: 'The name of the load balancer',
+            format: String,
+            default: '',
+            env: 'ELB_NAME',
+            arg: 'elb-name'
+        },
+        path: {
+            doc: 'The path the load balancer should use for the application',
+            format: String,
+            default: '',
+            env: 'ELB_PATH',
+            arg: 'elb-path'
+        },
+        targetGroup: {
+            name: {
+                doc: 'The name of the target group for the load balancer',
+                format: String,
+                default: '',
+                env: 'ELB_TARGET_GROUP_NAME',
+                arg: 'elb-target-group-name'
+            },
+            healthCheck: {
+                interval: {
+                    doc: 'Interval to check for healthy target',
+                    format: 'nat',
+                    default: 30
+                },
+                path: {
+                    doc: 'Path to check for healthy target',
+                    format: String,
+                    default: '/'
+                },
+                port: {
+                    doc: 'Port to check for healthy target',
+                    format: String,
+                    default: 'traffic-port'
+                },
+                timeout: {
+                    doc: 'Timeout for checking healthy target',
+                    format: 'nat',
+                    default: 5
+                },
+                healthyCount: {
+                    doc: 'Number of consecutive healthy checks',
+                    format: 'nat',
+                    default: 5
+                },
+                unhealthyCount: {
+                    doc: 'Number of consecutive unhealthy checks',
+                    format: 'nat',
+                    default: 2
+                }
+            }
+        }
+    },
     service: {
         name: {
             doc: 'The name of the service',
@@ -145,6 +202,11 @@ const config = convict({
             default: 200,
             env: 'SERVICE_MAXIMUM_PERCENT',
             arg: 'service-maximum-percent'
+        },
+        role: {
+            doc: 'The IAM role to use when creating the service if a load balancer needs to be created',
+            format: String,
+            default: 'ecsServiceRole'
         }
     },
     task: {

@@ -51,6 +51,18 @@ common:
 
 production:
     cluster: 'name-of-cluster'
+    loadBalancer:
+        name: 'load-balancer'
+        path: '/path/to/service'
+        targetGroup:
+            name: 'the-target-group'
+            healthCheck:
+                interval: 30
+                path: '/health-check'
+                port: 'traffic-port'
+                timeout: 10
+                healthyCount: 5
+                unhealthyCount: 2
     regions:
         - 'aws-region-1'
         - 'aws-region-2'
@@ -59,6 +71,7 @@ production:
         count: 2
         minimumPercent: 50
         maximumPercent: 200
+        role: ecsServiceRole
     task:
         name: 'the-task-name'
         networkMode: 'bridge|host|none'
