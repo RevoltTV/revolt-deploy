@@ -102,6 +102,10 @@ export function createTaskDefinition(imageUri) {
     task.family = config.get('task.name');
     task.networkMode = config.get('task.networkMode');
 
+    if (config.get('task.role')) {
+        task.taskRoleArn = config.get('task.role');
+    }
+
     let container = {};
     container.name = config.get('task.container.name');
     container.image = imageUri;

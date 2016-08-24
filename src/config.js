@@ -226,6 +226,13 @@ const config = convict({
             env: 'ECS_TASK_NETWORK_MODE',
             arg: 'ecs-task-network-mode'
         },
+        role: {
+            doc: 'The role to run the ECS task with',
+            format: String,
+            default: '',
+            env: 'ECS_TASK_ROLE',
+            arg: 'ecs-task-role'
+        },
         container: {
             name: {
                 doc: 'The name of the container',

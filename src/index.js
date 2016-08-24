@@ -23,6 +23,7 @@ commander
     .option('--ecr-region <region>', 'region that the elastic container repository is in')
     .option('--ecs-task-name <name>', 'name of the task')
     .option('--ecs-task-network-mode <mode>', 'network mode to use in the host for the task')
+    .option('--ecs-task-role <role>', 'role to run ECS task with')
     .option('--ecs-container-name <name>', 'name of the container in the task')
     .option('--ecs-container-cpu <units>', 'number of CPU units to reserve for the container')
     .option('--ecs-container-environment <env>', 'environmental variables to set in the container')
