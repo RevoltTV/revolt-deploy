@@ -146,12 +146,14 @@ export function getServiceLoadBalancer(region) {
     let elb = getELB(region);
     let targetGroup = config.get('loadBalancer.targetGroup.name');
 
-    if (!targetGroup) {
-        throw new Error(`target group name is not defined`);
-    }
-
     return getLoadBalancer(region)
     .then((lb) => {
+        if (!targetGroup) {
+            return {
+                loadBalancer: lb
+            };
+        }
+
         return elb.describeTargetGroups({
             LoadBalancerArn: lb.LoadBalancerArn
         }).promise()

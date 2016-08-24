@@ -36,11 +36,18 @@ function createService(taskDefinition, region) {
         if (elb) {
             let task = createTaskDefinition('image');
             params.loadBalancers = [];
-            params.loadBalancers.push({
+            let lb = {
                 containerName: task.containerDefinitions[0].name,
-                containerPort: task.containerDefinitions[0].portMappings[0].containerPort,
-                targetGroupArn: elb.targetGroup.TargetGroupArn
-            });
+                containerPort: task.containerDefinitions[0].portMappings[0].containerPort
+            };
+
+            if (elb.targetGroup) {
+                lb.targetGroupArn = elb.targetGroup.TargetGroupArn;
+            } else {
+                lb.loadBalancerName = elb.loadBalancer.LoadBalancerName;
+            }
+
+            params.loadBalancers.push(lb);
             params.role = config.get('service.role');
         }
 
