@@ -142,6 +142,12 @@ function getELB(region) {
     });
 }
 
+function getLegacyELB(region) {
+    return new AWS.ELB({
+        region
+    });
+}
+
 export function getServiceLoadBalancer(region) {
     let elb = getELB(region);
     let targetGroup = config.get('loadBalancer.targetGroup.name');
@@ -195,21 +201,39 @@ export function getListeners(region, loadBalancer) {
 export function getLoadBalancer(region) {
     let name = config.get('loadBalancer.name');
 
+
     if (!name) {
         throw new TypeError('load balancer name is not defined');
     }
 
+    let promise;
+    if (!config.get('loadBalancer.targetGroup.name')) {
+        let elb = getLegacyELB(region);
+        promise = elb.describeLoadBalancers({
+            LoadBalancerNames: [name]
+        }).promise()
+        .then((result) => {
+            if (result.LoadBalancerDescriptions.length === 0) {
+                throw new Error(`load balancer ${name} does not exist in ${region}`);
+            }
+
+            return result.LoadBalancerDescriptions[0];
+        });
+    } else {
+        let elb = getELB(region);
+        promise = elb.describeLoadBalancers({
+            Names: [name]
+        }).promise()
+        .then((result) => {
+            if (result.LoadBalancers.length === 0) {
+                throw new Error(`load balancer ${name} does not exist in ${region}`);
+            }
+
+            return result.LoadBalancers[0];
+        });
+    }
+
     console.log(chalk.dim(`fetching load balancer in ${region}`));
 
-    let elb = getELB(region);
-    return elb.describeLoadBalancers({
-        Names: [name]
-    }).promise()
-    .then((result) => {
-        if (result.LoadBalancers.length === 0) {
-            throw new Error(`load balancer ${name} does not exist in ${region}`);
-        }
-
-        return result.LoadBalancers[0];
-    });
+    return promise;
 }
