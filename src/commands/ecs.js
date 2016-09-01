@@ -237,8 +237,12 @@ export function registerTask(task) {
 
     return Promise.all(_.map(regions, (region) => {
         let ecs = getECS(region);
+        let regionalTask = _.extend({}, task);
+        if (config.get('task.container.logs.driver') === 'awslogs') {
+            regionalTask.containerDefinitions[0].logConfiguration.options['awslogs-region'] = _.get(config.get('task.container.logs.options'), 'awslogs-region', region);
+        }
 
-        return ecs.registerTaskDefinition(task).promise()
+        return ecs.registerTaskDefinition(regionalTask).promise()
         .then((result) => {
             let arn = result.taskDefinition.taskDefinitionArn;
             let family = task.family;
