@@ -1,9 +1,10 @@
 import _     from 'lodash';
 import chalk from 'chalk';
 
-import config      from '../config';
-import * as docker from './docker';
-import * as ecs    from './ecs';
+import config          from '../config';
+import * as docker     from './docker';
+import * as ecs        from './ecs';
+import * as cloudwatch from './cloudwatch';
 
 export default function deploy() {
     console.log(`\n${chalk.bold(`deploying ${config.get('name')}@${config.get('version')}`)}\n`);
@@ -16,8 +17,18 @@ export default function deploy() {
         return docker.push();
     })
     .then((repositoryUri) => {
+        let promise;
         let taskDefinition = ecs.createTaskDefinition(repositoryUri);
-        return ecs.registerTask(taskDefinition);
+
+        if (config.get('task.container.logs.driver')) {
+            promise = cloudwatch.ensureLogGroupsExist();
+        } else {
+            promise = Promise.resolve();
+        }
+        
+        return promise.then(() => {
+            return ecs.registerTask(taskDefinition);
+        });
     })
     .then((tasks) => {
         return ecs.ensureClusterExists()

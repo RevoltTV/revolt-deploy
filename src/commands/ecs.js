@@ -149,6 +149,13 @@ export function createTaskDefinition(imageUri) {
         };
     });
 
+    if (config.get('task.container.logs.driver')) {
+        container.logConfiguration = {
+            logDriver: config.get('task.container.logs.driver'),
+            options: config.get('task.container.logs.options')
+        };
+    }
+
     // Validate the container definition
     if (!container.memory && !container.memoryReservation) {
         throw new TypeError('task container must specify memory and/or memoryReservation');

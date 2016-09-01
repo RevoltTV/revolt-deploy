@@ -275,6 +275,22 @@ const config = convict({
                 default: null,
                 env: 'ECS_CONTAINER_PORTS',
                 arg: 'ecs-container-ports'
+            },
+            logs: {
+                driver: {
+                    doc: 'Driver to use for ECS logging utility',
+                    format: ['', 'json-file', 'syslog', 'journald', 'gelf', 'fluentd', 'awslogs'],
+                    default: '',
+                    env: 'ECS_CONTAINER_LOGS_DRIVER',
+                    arg: 'ecs-container-logs-driver'
+                },
+                options: {
+                    doc: 'Options to include for ECS logging utility',
+                    format: Object,
+                    default: {},
+                    env: 'ECS_CONTAINER_LOGS_OPTIONS',
+                    arg: 'ecs-container-logs-options'
+                }
             }
         }
     }
