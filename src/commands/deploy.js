@@ -25,7 +25,7 @@ export default function deploy() {
         } else {
             promise = Promise.resolve();
         }
-        
+
         return promise.then(() => {
             return ecs.registerTask(taskDefinition);
         });
@@ -42,7 +42,13 @@ export default function deploy() {
         console.log(`\n${chalk.dim('service deployed, waiting for')} ${chalk.bold.green('STABLE')}`);
         return Promise.all(_.map(services, ({service, region}) => {
             return ecs.waitForStable(service, region);
-        }));
+        }))
+        .then(() => {
+            console.log('\n\nDeregistering previous task definitions...');
+            return Promise.all(_.map(services, ({ previousTaskDefinition, region }) => {
+                return ecs.unregisterTask(previousTaskDefinition, region);
+            }));
+        });
     })
     .then(() => {
         console.log(`\n\n${chalk.bold.green('\u2713 DEPLOYED')}`);

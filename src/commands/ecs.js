@@ -217,15 +217,22 @@ export function runService(taskDefinition, region) {
     .then((result) => {
         if (result.services.length > 0 && result.services[0].status === 'ACTIVE') {
             // Service was found, we can update it
-            return updateService(taskDefinition, region);
+            return updateService(taskDefinition, region)
+            .then(({ service }) => {
+                return {
+                    service,
+                    previousTaskDefinition: result.services[0].taskDefinition
+                };
+            });
         }
 
         return createService(taskDefinition, region);
     })
-    .then(({service}) => {
+    .then(({ service, previousTaskDefinition }) => {
         return {
             service,
-            region
+            region,
+            previousTaskDefinition
         };
     });
 }
@@ -258,6 +265,17 @@ export function registerTask(task) {
     .then((tasks) => {
         console.log();
         return tasks;
+    });
+}
+
+export function unregisterTask(taskDefinition, region) {
+    let ecs = getECS(region);
+
+    return ecs.deregisterTaskDefinition({
+        taskDefinition
+    }).promise()
+    .then(() => {
+        console.log(`    ${chalk.bold.green('\u2713')} deregistered previous task definition ${taskDefinition} from ${region}`);
     });
 }
 
