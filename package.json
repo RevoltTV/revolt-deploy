@@ -1,6 +1,6 @@
 {
   "name": "@revolttv/revolt-deploy",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "Tool for deploying to Amazon Elastic Container Service.",
   "bin": {
     "revolt-deploy": "bin/revolt-deploy"
