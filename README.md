@@ -89,6 +89,11 @@ production:
             environment:
                 NODE_ENV: 'production'
                 LOG_LEVEL: 'info'
+            logs:
+                driver: 'awslogs'
+                options:
+                    awslogs-group: 'service-logs-group'
+                retention: 7
 ```
 
 ### Token Replacement

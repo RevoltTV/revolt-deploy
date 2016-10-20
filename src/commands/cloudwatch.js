@@ -46,6 +46,15 @@ export function ensureLogGroupsExist() {
                 logGroupName
             }).promise()
             .then(() => {
+                let retention = config.get('task.container.logs.retention');
+                if (retention) {
+                    return cloudWatch.putRetentionPolicy({
+                        logGroupName,
+                        retentionInDays: retention
+                    }).promise();
+                }
+            })
+            .then(() => {
                 console.log(`    ${chalk.bold.green('\u2713')} log group ${logGroupName} created in ${region}`);
             });
         });

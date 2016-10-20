@@ -290,6 +290,13 @@ const config = convict({
                     default: {},
                     env: 'ECS_CONTAINER_LOGS_OPTIONS',
                     arg: 'ecs-container-logs-options'
+                },
+                retention: {
+                    doc: 'The number of days to keep logs',
+                    format: 'nullable-integer',
+                    default: 7,
+                    env: 'ECS_CONTAINER_LOGS_RETENTION',
+                    arg: 'ecs-container-logs-retention'
                 }
             }
         }
