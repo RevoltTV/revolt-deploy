@@ -269,6 +269,10 @@ export function registerTask(task) {
 }
 
 export function unregisterTask(taskDefinition, region) {
+    if (!taskDefinition) {
+        return;
+    }
+
     let ecs = getECS(region);
 
     return ecs.deregisterTaskDefinition({
