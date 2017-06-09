@@ -71,21 +71,30 @@ function configureLoadBalancer(region, loadBalancer) {
 
 function createRule(region, listener, targetGroup, priority) {
     let elb = getELB(region);
-    let path = config.get('loadBalancer.path');
 
     console.log(chalk.dim(`creating listener rule for group ${targetGroup.TargetGroupName} in ${region}`));
+
+    const conditions = [];
+    if (config.get('loadBalancer.path')) {
+        conditions.push({
+            Field: 'path-pattern',
+            Values: [config.get('loadBalancer.path')]
+        });
+    }
+
+    if (config.get('loadBalancer.host')) {
+        conditions.push({
+            Field: 'host-header',
+            Values: [config.get('loadBalancer.host')]
+        });
+    }
 
     return elb.createRule({
         Actions: [{
             TargetGroupArn: targetGroup.TargetGroupArn,
             Type: 'forward'
         }],
-        Conditions: [{
-            Field: 'path-pattern',
-            Values: [
-                path
-            ]
-        }],
+        Conditions: conditions,
         ListenerArn: listener.ListenerArn,
         Priority: priority
     }).promise()

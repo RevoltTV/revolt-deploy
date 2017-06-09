@@ -53,6 +53,7 @@ production:
     cluster: 'name-of-cluster'
     loadBalancer:
         name: 'load-balancer'
+        host: 'your-app.example.com'
         path: '/path/to/service'
         targetGroup:
             name: 'the-target-group'

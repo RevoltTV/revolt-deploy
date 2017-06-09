@@ -122,8 +122,15 @@ const config = convict({
             env: 'ELB_NAME',
             arg: 'elb-name'
         },
+        host: {
+            doc: 'The hostname to match for the application',
+            format: String,
+            default: '',
+            env: 'ELB_HOST',
+            arg: 'elb-host'
+        },
         path: {
-            doc: 'The path the load balancer should use for the application',
+            doc: 'The path to match for the application',
             format: String,
             default: '',
             env: 'ELB_PATH',
