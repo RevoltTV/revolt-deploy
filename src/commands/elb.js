@@ -210,7 +210,6 @@ export function getListeners(region, loadBalancer) {
 export function getLoadBalancer(region) {
     let name = config.get('loadBalancer.name');
 
-
     if (!name) {
         throw new TypeError('load balancer name is not defined');
     }

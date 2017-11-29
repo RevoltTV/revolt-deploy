@@ -27,7 +27,7 @@ export function login() {
     .then(({ user, password, endpoint }) => {
         console.log(chalk.dim('logging into docker...'));
 
-        return spawn('docker', ['login', '-u', user, '-p', password, '-e', 'none', endpoint]);
+        return spawn('docker', ['login', '-u', user, '-p', password, endpoint]);
     });
 }
 

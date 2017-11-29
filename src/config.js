@@ -198,6 +198,13 @@ const config = convict({
             env: 'SERVICE_COUNT',
             arg: 'service-count'
         },
+        launchType: {
+            doc: 'Method to run the task, either "fargate" or "ec2", defaults to "ec2"',
+            format: ['fargate', 'ec2'],
+            default: 'ec2',
+            env: 'ECS_LAUNCH_TYPE',
+            arg: 'ecs-launch-type'
+        },
         minimumPercent: {
             doc: 'The minimum healthy percent to initialize the service with',
             format: 'nat',
@@ -228,7 +235,7 @@ const config = convict({
         },
         networkMode: {
             doc: 'The Docker networking mode for the container of the task',
-            format: ['bridge', 'host', 'none'],
+            format: ['bridge', 'awsvpc', 'host', 'none'],
             default: 'bridge',
             env: 'ECS_TASK_NETWORK_MODE',
             arg: 'ecs-task-network-mode'
@@ -336,9 +343,11 @@ function replaceTokens(obj, parents) {
             return;
         }
 
-        value = value.replace(/\$\{VERSION_MAJOR\}/g, semver.major(config.get('version')))
-                     .replace(/\$\{VERSION_MINOR\}/g, semver.minor(config.get('version')))
-                     .replace(/\$\{VERSION\}/g, config.get('version'));
+        value = (
+            value.replace(/\$\{VERSION_MAJOR\}/g, semver.major(config.get('version')))
+            .replace(/\$\{VERSION_MINOR\}/g, semver.minor(config.get('version')))
+            .replace(/\$\{VERSION\}/g, config.get('version'))
+        );
 
         config.set(parents + key, value);
     });

@@ -25,6 +25,7 @@ function createService(taskDefinition, region) {
         let params = {
             desiredCount: service.count,
             serviceName: service.name,
+            launchType: service.launchType.toUpperCase(),
             taskDefinition,
             cluster,
             deploymentConfiguration: {
@@ -83,6 +84,7 @@ function updateService(taskDefinition, region) {
 
     return ecs.updateService({
         service: service.name,
+        launchType: service.launchType.toUpperCase(),
         cluster,
         taskDefinition
     }).promise()
