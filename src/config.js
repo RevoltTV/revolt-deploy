@@ -1,9 +1,9 @@
-import _       from 'lodash';
+import _ from 'lodash';
 import convict from 'convict';
-import fs      from 'fs';
-import jsYaml  from 'js-yaml';
-import path    from 'path';
-import semver  from 'semver';
+import fs from 'fs';
+import jsYaml from 'js-yaml';
+import path from 'path';
+import semver from 'semver';
 
 let pkg;
 try {
@@ -14,15 +14,17 @@ try {
 
 convict.addFormat({
     name: 'aws-name',
-    validate: function (value) {
+    validate: function(value) {
         if (!/^[a-zA-Z0-9\-_]{1,255}$/.test(value)) {
-            throw new TypeError('value format is up to 255 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed');
+            throw new TypeError(
+                'value format is up to 255 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed'
+            );
         }
     }
 });
 convict.addFormat({
     name: 'nullable-integer',
-    validate: function (value) {
+    validate: function(value) {
         if (!value) {
             return;
         }
@@ -34,7 +36,7 @@ convict.addFormat({
 });
 convict.addFormat({
     name: 'string-or-array',
-    validate: function (value) {
+    validate: function(value) {
         if (!_.isString(value) && !_.isArray(value)) {
             throw new TypeError('value must be either a string or an array');
         }
@@ -336,9 +338,10 @@ function replaceTokens(obj, parents) {
             return;
         }
 
-        value = value.replace(/\$\{VERSION_MAJOR\}/g, semver.major(config.get('version')))
-                     .replace(/\$\{VERSION_MINOR\}/g, semver.minor(config.get('version')))
-                     .replace(/\$\{VERSION\}/g, config.get('version'));
+        value = value
+            .replace(/\$\{VERSION_MAJOR\}/g, semver.major(config.get('version')))
+            .replace(/\$\{VERSION_MINOR\}/g, semver.minor(config.get('version')))
+            .replace(/\$\{VERSION\}/g, config.get('version'));
 
         config.set(parents + key, value);
     });

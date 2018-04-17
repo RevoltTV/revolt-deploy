@@ -1,5 +1,5 @@
-import _     from 'lodash';
-import AWS   from 'aws-sdk';
+import _ from 'lodash';
+import AWS from 'aws-sdk';
 import chalk from 'chalk';
 
 import config from '../config';
@@ -27,37 +27,48 @@ export function ensureLogGroupsExist() {
         return Promise.reject(new TypeError('awslogs-group is a required option in task.container.logs.options'));
     }
 
-    return Promise.all(_.map(regions, (region) => {
-        let cloudWatch = getCloudWatchLogs(region);
+    return Promise.all(
+        _.map(regions, region => {
+            let cloudWatch = getCloudWatchLogs(region);
 
-        console.log(chalk.dim(`ensuring log group ${logGroupName} exists in ${region}`));
-        return cloudWatch.describeLogGroups({
-            limit: 1,
-            logGroupNamePrefix: logGroupName
-        }).promise()
-        .then((result) => {
-            if (result.logGroups && result.logGroups.length > 0) {
-                console.log(`    ${chalk.bold.green('\u2713')} log group ${logGroupName} found in ${region}`);
-                return;
-            }
+            console.log(chalk.dim(`ensuring log group ${logGroupName} exists in ${region}`));
+            return cloudWatch
+                .describeLogGroups({
+                    limit: 1,
+                    logGroupNamePrefix: logGroupName
+                })
+                .promise()
+                .then(result => {
+                    if (result.logGroups && result.logGroups.length > 0) {
+                        console.log(`    ${chalk.bold.green('\u2713')} log group ${logGroupName} found in ${region}`);
+                        return;
+                    }
 
-            console.log(chalk.dim(`creating log group ${logGroupName} in ${region}`));
-            return cloudWatch.createLogGroup({
-                logGroupName
-            }).promise()
-            .then(() => {
-                let retention = config.get('task.container.logs.retention');
-                if (retention) {
-                    return cloudWatch.putRetentionPolicy({
-                        logGroupName,
-                        retentionInDays: retention
-                    }).promise();
-                }
-            })
-            .then(() => {
-                console.log(`    ${chalk.bold.green('\u2713')} log group ${logGroupName} created in ${region}`);
-            });
-        });
-    }))
-    .then(() => { console.log(); });
+                    console.log(chalk.dim(`creating log group ${logGroupName} in ${region}`));
+                    return cloudWatch
+                        .createLogGroup({
+                            logGroupName
+                        })
+                        .promise()
+                        .then(() => {
+                            let retention = config.get('task.container.logs.retention');
+                            if (retention) {
+                                return cloudWatch
+                                    .putRetentionPolicy({
+                                        logGroupName,
+                                        retentionInDays: retention
+                                    })
+                                    .promise();
+                            }
+                        })
+                        .then(() => {
+                            console.log(
+                                `    ${chalk.bold.green('\u2713')} log group ${logGroupName} created in ${region}`
+                            );
+                        });
+                });
+        })
+    ).then(() => {
+        console.log();
+    });
 }
